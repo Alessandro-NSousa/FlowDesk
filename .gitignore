@@ -1,0 +1,15 @@
+.env
+*.pyc
+__pycache__/
+*.pyo
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+staticfiles/
+media/
+node_modules/
+.angular/
+*.log
+db.sqlite3
