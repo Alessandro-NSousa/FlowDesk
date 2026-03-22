@@ -66,9 +66,18 @@ class CreateTicketUseCase:
             created_by=created_by,
         )
 
-        # RF21 – Notificação assíncrona
-        from apps.tickets.application.tasks import notify_sector_new_ticket
-        notify_sector_new_ticket.delay(str(ticket.id))
+        # RF21 – Notificação assíncrona: despacha em thread daemon para não
+        # bloquear o request caso o broker (Redis) esteja indisponível.
+        import threading
+
+        def _dispatch():
+            try:
+                from apps.tickets.application.tasks import notify_sector_new_ticket
+                notify_sector_new_ticket.delay(str(ticket.id))
+            except Exception:
+                pass
+
+        threading.Thread(target=_dispatch, daemon=True).start()
 
         return ticket
 
