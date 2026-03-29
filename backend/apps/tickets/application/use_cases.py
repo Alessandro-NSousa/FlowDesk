@@ -5,6 +5,8 @@ from apps.sectors.infrastructure.models import Sector
 from apps.tickets.infrastructure.models import Ticket, TicketObservation, TicketStatus
 from apps.users.infrastructure.models import User
 
+_UNSET = object()  # sentinel para distinguir "não enviado" de None
+
 
 class CreateDefaultStatusesUseCase:
     """RF18 – Cria os três status padrão do sistema se ainda não existirem."""
@@ -44,6 +46,7 @@ class CreateTicketUseCase:
         requesting_sector_id: str,
         responsible_sector_id: str,
         created_by: User,
+        assigned_to_id: str | None = None,
     ) -> Ticket:
         requesting_sector = Sector.objects.get(pk=requesting_sector_id)
         responsible_sector = Sector.objects.get(pk=responsible_sector_id)
@@ -51,6 +54,12 @@ class CreateTicketUseCase:
         # RF09 – Usuário precisa ser membro do setor solicitante
         if not created_by.is_admin and not requesting_sector.members.filter(pk=created_by.pk).exists():
             raise PermissionError("Você não é membro do setor solicitante.")
+
+        assigned_to = None
+        if assigned_to_id:
+            assigned_to = User.objects.get(pk=assigned_to_id)
+            if not responsible_sector.members.filter(pk=assigned_to.pk).exists():
+                raise ValueError("O usuário atribuído não é membro do setor responsável.")
 
         default_status = TicketStatus.objects.filter(name="Pendente", sector=None).first()
         if not default_status:
@@ -64,6 +73,7 @@ class CreateTicketUseCase:
             responsible_sector=responsible_sector,
             status=default_status,
             created_by=created_by,
+            assigned_to=assigned_to,
         )
 
         # RF21 – Notificação assíncrona: despacha em thread daemon para não
@@ -94,6 +104,7 @@ class UpdateTicketUseCase:
         status_id: str | None = None,
         title: str | None = None,
         description: str | None = None,
+        assigned_to_id=_UNSET,
         observation: str | None = None,
     ) -> Ticket:
         ticket = Ticket.objects.select_related("responsible_sector", "status").get(pk=ticket_id)
@@ -112,6 +123,15 @@ class UpdateTicketUseCase:
         if description is not None:
             ticket.description = description
 
+        if assigned_to_id is not _UNSET:
+            if assigned_to_id is None:
+                ticket.assigned_to = None
+            else:
+                assigned_user = User.objects.get(pk=assigned_to_id)
+                if not ticket.responsible_sector.members.filter(pk=assigned_user.pk).exists():
+                    raise ValueError("O usuário atribuído não é membro do setor responsável.")
+                ticket.assigned_to = assigned_user
+
         if status_id is not None:
             new_status = TicketStatus.objects.get(pk=status_id)
             if new_status.name == self.DONE_STATUS_NAME:
@@ -128,6 +148,34 @@ class UpdateTicketUseCase:
                 return ticket
             ticket.status = new_status
 
+        ticket.updated_by = requesting_user
+        ticket.save()
+        return ticket
+
+
+class AssignTicketUseCase:
+    """Assume um chamado sem atribuição ou reatribui para outro membro do setor."""
+
+    DONE_STATUS_NAME = "Concluído"
+
+    def execute(self, ticket_id: str, requesting_user: User, target_user_id: str | None = None) -> Ticket:
+        ticket = Ticket.objects.select_related("responsible_sector", "status").get(pk=ticket_id)
+
+        if ticket.status.name == self.DONE_STATUS_NAME:
+            raise ValueError("Chamados concluídos não podem ser alterados.")
+
+        if not requesting_user.is_admin:
+            if not ticket.responsible_sector.members.filter(pk=requesting_user.pk).exists():
+                raise PermissionError("Apenas membros do setor responsável podem assumir o chamado.")
+
+        if target_user_id:
+            assigned = User.objects.get(pk=target_user_id)
+            if not ticket.responsible_sector.members.filter(pk=assigned.pk).exists():
+                raise ValueError("O usuário alvo não é membro do setor responsável.")
+        else:
+            assigned = requesting_user
+
+        ticket.assigned_to = assigned
         ticket.updated_by = requesting_user
         ticket.save()
         return ticket

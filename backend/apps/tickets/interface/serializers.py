@@ -35,6 +35,7 @@ class TicketSerializer(serializers.ModelSerializer):
     responsible_sector = SectorSerializer(read_only=True)
     created_by = UserSerializer(read_only=True)
     updated_by = UserSerializer(read_only=True)
+    assigned_to = UserSerializer(read_only=True)
     observations = TicketObservationSerializer(many=True, read_only=True)
 
     class Meta:
@@ -42,7 +43,7 @@ class TicketSerializer(serializers.ModelSerializer):
         fields = [
             "id", "title", "description",
             "requesting_sector", "responsible_sector",
-            "status", "created_by", "updated_by",
+            "status", "created_by", "updated_by", "assigned_to",
             "created_at", "updated_at", "observations",
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
@@ -53,10 +54,12 @@ class TicketCreateSerializer(serializers.Serializer):
     description = serializers.CharField()
     requesting_sector_id = serializers.UUIDField()
     responsible_sector_id = serializers.UUIDField()
+    assigned_to_id = serializers.UUIDField(required=False, allow_null=True)
 
 
 class TicketUpdateSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=200, required=False)
     description = serializers.CharField(required=False)
     status_id = serializers.UUIDField(required=False)
+    assigned_to_id = serializers.UUIDField(required=False, allow_null=True)
     observation = serializers.CharField(required=False, allow_blank=False)
