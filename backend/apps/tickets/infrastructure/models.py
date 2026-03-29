@@ -57,6 +57,14 @@ class Ticket(models.Model):
         related_name="tickets",
         verbose_name="Status",
     )
+    assigned_to = models.ForeignKey(
+        "users.User",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="assigned_tickets",
+        verbose_name="Atribuído a",
+    )
     created_by = models.ForeignKey(
         "users.User",
         on_delete=models.PROTECT,

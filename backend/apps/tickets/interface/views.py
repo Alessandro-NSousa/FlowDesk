@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.tickets.application.use_cases import (
+    AssignTicketUseCase,
     CreateCustomStatusUseCase,
     CreateDefaultStatusesUseCase,
     CreateTicketUseCase,
@@ -121,6 +122,25 @@ class TicketDetailView(generics.RetrieveUpdateAPIView):
                 ticket_id=str(kwargs["pk"]),
                 requesting_user=request.user,
                 **serializer.validated_data,
+            )
+        except PermissionError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_403_FORBIDDEN)
+        except Exception as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(TicketSerializer(ticket).data)
+
+
+class TicketAssignView(APIView):
+    """POST /tickets/{id}/assign/ – Assume ou reatribui um chamado."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        target_user_id = request.data.get("user_id")  # opcional; sem ele assume p/ si
+        try:
+            ticket = AssignTicketUseCase().execute(
+                ticket_id=str(pk),
+                requesting_user=request.user,
+                target_user_id=target_user_id,
             )
         except PermissionError as exc:
             return Response({"detail": str(exc)}, status=status.HTTP_403_FORBIDDEN)
