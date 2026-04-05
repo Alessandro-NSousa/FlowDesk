@@ -14,6 +14,10 @@ export class UserService {
     return this.http.get<PaginatedResponse<User>>(this.API).pipe(map((res) => res.results));
   }
 
+  listAll(): Observable<User[]> {
+    return this.http.get<User[]>(`${environment.apiUrl}/auth/users/all/`);
+  }
+
   listAvailable(): Observable<User[]> {
     return this.http.get<PaginatedResponse<User>>(this.API, { params: { available: 'true' } }).pipe(map((res) => res.results));
   }

@@ -39,7 +39,15 @@ export interface Sector {
   description: string;
   members: User[];
   member_count: number;
+  features: SectorFeature[];
   created_at: string;
+}
+
+export interface SectorFeature {
+  id: number;
+  slug: string;
+  name: string;
+  is_default: boolean;
 }
 
 export interface TicketStatus {
@@ -90,4 +98,32 @@ export interface AuthState {
   access: string;
   refresh: string;
   user?: Partial<User>;
+}
+
+// Patrimônio
+export type PatrimonyCondition = 'Novo' | 'Usado';
+export type PatrimonySituation = 'Disponível' | 'Depreciado' | 'Em Uso';
+
+export interface Patrimony {
+  id: string;
+  number: string;
+  name: string;
+  sector: Sector;
+  user?: User;
+  adhesion_date: string;
+  condition: PatrimonyCondition;
+  situation: PatrimonySituation;
+  write_off_date?: string;
+  created_at: string;
+}
+
+export interface PatrimonyPayload {
+  number: string;
+  name: string;
+  sector_id: string;
+  user_id?: string | null;
+  adhesion_date: string;
+  condition: PatrimonyCondition;
+  situation: PatrimonySituation;
+  write_off_date?: string | null;
 }

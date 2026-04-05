@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { FeatureService } from '../../core/services/feature.service';
 
 @Component({
   selector: 'fd-shell',
@@ -19,6 +20,9 @@ import { AuthService } from '../../core/services/auth.service';
           </a>
           <a routerLink="/tickets" routerLinkActive="active" class="nav-item">
             <span>Chamados</span>
+          </a>
+          <a *ngIf="hasPatrimony()" routerLink="/patrimony" routerLinkActive="active" class="nav-item">
+            <span>Patrimônio</span>
           </a>
           <a *ngIf="isAdmin()" routerLink="/sectors" routerLinkActive="active" class="nav-item">
             <span>Setores</span>
@@ -57,9 +61,14 @@ import { AuthService } from '../../core/services/auth.service';
 export class ShellComponent {
   private auth = inject(AuthService);
   private router = inject(Router);
+  private featureService = inject(FeatureService);
 
   isAdmin(): boolean {
     return this.auth.isAdmin();
+  }
+
+  hasPatrimony(): boolean {
+    return this.isAdmin() || this.featureService.hasFeature('patrimony');
   }
 
   userName(): string {
