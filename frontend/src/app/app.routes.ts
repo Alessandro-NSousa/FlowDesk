@@ -19,6 +19,11 @@ export const routes: Routes = [
     loadChildren: () => import('./features/tickets/tickets.routes').then((m) => m.TICKETS_ROUTES),
   },
   {
+    path: 'patrimony',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./features/patrimony/patrimony.routes').then((m) => m.PATRIMONY_ROUTES),
+  },
+  {
     path: 'sectors',
     canActivate: [AuthGuard, AdminGuard],
     loadChildren: () => import('./features/sectors/sectors.routes').then((m) => m.SECTORS_ROUTES),

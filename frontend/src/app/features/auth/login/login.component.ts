@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { FeatureService } from '../../../core/services/feature.service';
 
 @Component({
   selector: 'fd-login',
@@ -113,6 +114,7 @@ export class LoginComponent {
 
   private auth = inject(AuthService);
   private router = inject(Router);
+  private featureService = inject(FeatureService);
 
   onSubmit(): void {
     if (!this.email || !this.password) return;
@@ -120,7 +122,12 @@ export class LoginComponent {
     this.errorMessage = '';
 
     this.auth.login(this.email, this.password).subscribe({
-      next: () => this.router.navigate(['/dashboard']),
+      next: () => {
+        this.featureService.loadUserFeatures().subscribe({
+          complete: () => this.router.navigate(['/dashboard']),
+          error: () => this.router.navigate(['/dashboard']),
+        });
+      },
       error: () => {
         this.errorMessage = 'E-mail ou senha inválidos.';
         this.loading = false;

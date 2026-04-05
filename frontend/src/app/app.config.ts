@@ -1,8 +1,19 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideZoneChangeDetection, APP_INITIALIZER } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient, withInterceptors, HTTP_INTERCEPTORS, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, HTTP_INTERCEPTORS, withInterceptorsFromDi } from '@angular/common/http';
 import { routes } from './app.routes';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
+import { AuthService } from './core/services/auth.service';
+import { FeatureService } from './core/services/feature.service';
+
+function initializeFeatures(auth: AuthService, featureService: FeatureService) {
+  return () => {
+    if (auth.isAuthenticated()) {
+      return featureService.loadUserFeatures();
+    }
+    return Promise.resolve();
+  };
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -12,6 +23,12 @@ export const appConfig: ApplicationConfig = {
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
+      multi: true,
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeFeatures,
+      deps: [AuthService, FeatureService],
       multi: true,
     },
   ],
