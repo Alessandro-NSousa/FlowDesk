@@ -44,6 +44,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name="Pode atribuir chamados",
         help_text="Quando True, o usuário pode reatribuir chamados abertos para outros membros do setor.",
     )
+    can_manage_patrimony = models.BooleanField(
+        default=False,
+        verbose_name="Pode gerenciar patrimônio",
+        help_text="Quando True, o usuário pode criar, editar e excluir patrimônios nos setores que possui acesso.",
+    )
     invite_token = models.UUIDField(null=True, blank=True, unique=True, verbose_name="Token de convite")
     invite_sent_at = models.DateTimeField(null=True, blank=True, verbose_name="Convite enviado em")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Criado em")

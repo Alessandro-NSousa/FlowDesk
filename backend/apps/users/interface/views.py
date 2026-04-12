@@ -53,6 +53,16 @@ class UserListCreateView(generics.ListCreateAPIView):
         return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
 
+class UserSelectListView(generics.ListAPIView):
+    """Listagem simplificada de usuários para dropdowns (qualquer usuário autenticado)."""
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        return User.objects.all().order_by("first_name", "last_name")
+
+
 class UserDetailView(APIView):
     """Admin consulta, atualiza e remove um usuário."""
     permission_classes = [IsAuthenticated, IsAdminUser]

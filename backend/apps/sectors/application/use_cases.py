@@ -1,17 +1,39 @@
 """
 Application use-cases for the Sectors bounded context.
 """
-from apps.sectors.infrastructure.models import Sector
+from apps.sectors.infrastructure.models import Sector, SectorFeature
 from apps.users.infrastructure.models import User
 
 
 class CreateSectorUseCase:
     """RF10 – Cadastro de setores."""
 
-    def execute(self, name: str, description: str = "") -> Sector:
+    def execute(self, name: str, description: str = "", feature_slugs: list[str] | None = None) -> Sector:
         if Sector.objects.filter(name=name).exists():
             raise ValueError(f"Já existe um setor com o nome '{name}'.")
-        return Sector.objects.create(name=name, description=description)
+        sector = Sector.objects.create(name=name, description=description)
+
+        if feature_slugs is not None:
+            # Garante que "tickets" sempre esteja presente
+            slugs = set(feature_slugs) | {"tickets"}
+            features = SectorFeature.objects.filter(slug__in=slugs)
+        else:
+            features = SectorFeature.objects.filter(is_default=True)
+
+        sector.features.set(features)
+        return sector
+
+
+class UpdateSectorFeaturesUseCase:
+    """Atualiza as funcionalidades habilitadas em um setor."""
+
+    def execute(self, sector_id: str, feature_slugs: list[str]) -> Sector:
+        sector = Sector.objects.get(pk=sector_id)
+        # "tickets" não pode ser removido
+        slugs = set(feature_slugs) | {"tickets"}
+        features = SectorFeature.objects.filter(slug__in=slugs)
+        sector.features.set(features)
+        return sector
 
 
 class AddUserToSectorUseCase:

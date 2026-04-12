@@ -10,6 +10,7 @@ from apps.users.interface.views import (
     PasswordResetRequestView,
     UserDetailView,
     UserListCreateView,
+    UserSelectListView,
 )
 
 urlpatterns = [
@@ -20,6 +21,7 @@ urlpatterns = [
 
     # Gerenciamento de membros (CRUD – somente admin)
     path("users/", UserListCreateView.as_view(), name="user-list-create"),
+    path("users/all/", UserSelectListView.as_view(), name="user-select-list"),
     path("users/<uuid:pk>/", UserDetailView.as_view(), name="user-detail"),
 
     # Recuperação de senha
