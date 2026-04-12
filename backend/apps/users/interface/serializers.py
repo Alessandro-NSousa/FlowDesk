@@ -7,7 +7,7 @@ from apps.users.infrastructure.models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "email", "first_name", "last_name", "is_admin", "is_active", "must_change_password", "can_assign_tickets", "created_at"]
+        fields = ["id", "email", "first_name", "last_name", "is_admin", "is_active", "must_change_password", "can_assign_tickets", "can_manage_patrimony", "created_at"]
         read_only_fields = ["id", "is_active", "must_change_password", "created_at"]
 
 
@@ -26,6 +26,7 @@ class UpdateUserSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False)
     is_admin = serializers.BooleanField(required=False)
     can_assign_tickets = serializers.BooleanField(required=False)
+    can_manage_patrimony = serializers.BooleanField(required=False)
 
 
 class ChangePasswordSerializer(serializers.Serializer):
@@ -58,4 +59,5 @@ class FlowDeskTokenObtainPairSerializer(TokenObtainPairSerializer):
         token["is_admin"] = user.is_admin
         token["must_change_password"] = user.must_change_password
         token["can_assign_tickets"] = user.can_assign_tickets
+        token["can_manage_patrimony"] = user.can_manage_patrimony
         return token

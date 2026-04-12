@@ -69,7 +69,7 @@ import { ShellComponent } from '../../../shared/shell/shell.component';
                 <td>{{ item.write_off_date ? (item.write_off_date | date:'dd/MM/yyyy') : '—' }}</td>
                 <td *ngIf="canEdit()" class="actions">
                   <button (click)="openEdit(item)" class="btn-action">Editar</button>
-                  <button *ngIf="isAdmin()" (click)="deleteItem(item)" class="btn-action btn-action-danger">Excluir</button>
+                  <button *ngIf="canEdit()" (click)="deleteItem(item)" class="btn-action btn-action-danger">Excluir</button>
                 </td>
               </tr>
             </tbody>
@@ -221,7 +221,7 @@ export class PatrimonyListComponent implements OnInit {
   }
 
   canEdit(): boolean {
-    return this.isAdmin() || this.featureService.hasFeature('patrimony');
+    return this.isAdmin() || (this.featureService.hasFeature('patrimony') && this.auth.canManagePatrimony());
   }
 
   /** Setores disponíveis no formulário: todos os setores para qualquer usuário */

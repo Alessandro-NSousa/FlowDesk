@@ -8,6 +8,7 @@ export interface User {
   is_active: boolean;
   must_change_password: boolean;
   can_assign_tickets: boolean;
+  can_manage_patrimony: boolean;
   created_at: string;
 }
 
@@ -26,6 +27,7 @@ export interface UpdateUserPayload {
   email?: string;
   is_admin?: boolean;
   can_assign_tickets?: boolean;
+  can_manage_patrimony?: boolean;
 }
 
 export interface ChangePasswordPayload {
