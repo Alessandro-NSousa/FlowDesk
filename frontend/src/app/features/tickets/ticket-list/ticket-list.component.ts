@@ -16,7 +16,6 @@ import { ShellComponent } from '../../../shared/shell/shell.component';
       <div class="page">
         <div class="page-header">
           <h2>Chamados</h2>
-          <a routerLink="/tickets/new" class="btn btn-primary">+ Novo chamado</a>
         </div>
 
         <!-- Filtros RF24 -->
@@ -54,6 +53,7 @@ import { ShellComponent } from '../../../shared/shell/shell.component';
         </div>
         <div class="filters-action">
           <button (click)="applyFilters()" class="btn btn-search">Buscar</button>
+          <a routerLink="/tickets/new" class="btn btn-primary">+ Novo chamado</a>
         </div>
 
         <div *ngIf="loading()" class="loading">Carregando...</div>
@@ -98,14 +98,14 @@ import { ShellComponent } from '../../../shared/shell/shell.component';
   `,
   styles: [`
     .page { padding:1.5rem; }
-    .page-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem; }
+    .page-header { display:flex;align-items:center;margin-bottom:1.5rem; }
     .page-header h2 { font-size:1.5rem;font-weight:700; }
     .btn { padding:.5rem 1rem;border:none;border-radius:6px;cursor:pointer;font-weight:600; }
     .btn-primary { background:#4f46e5;color:#fff; }
     .btn-outline { padding:.4rem .9rem;border:1px solid #d1d5db;background:#fff;border-radius:6px;cursor:pointer; }
     .btn-search { background:#4f46e5;color:#fff;min-width:120px; }
     .filters { display:flex;gap:.75rem;margin-bottom:.75rem;flex-wrap:wrap;align-items:center; }
-    .filters-action { display:flex;justify-content:center;margin-bottom:1.25rem; }
+    .filters-action { display:flex;justify-content:flex-end;gap:.75rem;flex-wrap:wrap;margin-bottom:1.25rem; }
     .filter-control { padding:.45rem .75rem;border:1px solid #d1d5db;border-radius:6px;font-size:.85rem;min-width:140px; }
     .table { width:100%;border-collapse:collapse;font-size:.85rem;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07); }
     .unassigned-row { background:#fffbeb; }
