@@ -261,7 +261,7 @@ export class TicketDetailComponent implements OnInit {
         this.assuming.set(false);
       },
       error: (err) => {
-        this.assumeError.set(err?.error?.detail ?? 'Erro ao assumir chamado.');
+        this.assumeError.set(this.getApiErrorMessage(err, 'Erro ao assumir chamado.'));
         this.assuming.set(false);
       },
     });
@@ -298,10 +298,23 @@ export class TicketDetailComponent implements OnInit {
         this.updating.set(false);
       },
       error: (err) => {
-        this.updateError.set(err?.error?.detail ?? 'Erro ao atualizar chamado.');
+        this.updateError.set(this.getApiErrorMessage(err, 'Erro ao atualizar chamado.'));
         this.updating.set(false);
       },
     });
+  }
+
+  private getApiErrorMessage(err: unknown, fallback: string): string {
+    const apiError = (err as { error?: Record<string, unknown> } | null)?.error;
+    if (!apiError) return fallback;
+    if (typeof apiError['detail'] === 'string') return apiError['detail'];
+
+    for (const value of Object.values(apiError)) {
+      if (typeof value === 'string') return value;
+      if (Array.isArray(value) && typeof value[0] === 'string') return value[0];
+    }
+
+    return fallback;
   }
 
   getBadge(name: string): string {
