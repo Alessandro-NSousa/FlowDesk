@@ -58,8 +58,27 @@ class TicketCreateSerializer(serializers.Serializer):
 
 
 class TicketUpdateSerializer(serializers.Serializer):
+    DONE_STATUS_NAME = "Concluído"
+
     title = serializers.CharField(max_length=200, required=False)
     description = serializers.CharField(required=False)
     status_id = serializers.UUIDField(required=False)
     assigned_to_id = serializers.UUIDField(required=False, allow_null=True)
     observation = serializers.CharField(required=False, allow_blank=False)
+
+    def validate(self, attrs):
+        status_id = attrs.get("status_id")
+        if not status_id:
+            return attrs
+
+        try:
+            status = TicketStatus.objects.only("name").get(pk=status_id)
+        except TicketStatus.DoesNotExist as exc:
+            raise serializers.ValidationError({"status_id": "Status inválido."}) from exc
+
+        if status.name == self.DONE_STATUS_NAME and not attrs.get("observation"):
+            raise serializers.ValidationError(
+                {"observation": "É obrigatório adicionar uma observação ao concluir o chamado."}
+            )
+
+        return attrs
