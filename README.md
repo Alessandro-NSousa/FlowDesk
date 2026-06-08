@@ -107,11 +107,41 @@ npm start   # proxy → http://localhost:8000
 | POST | `/api/v1/auth/password-reset/confirm/` | Confirmar nova senha |
 | GET | `/api/v1/auth/me/` | Perfil do usuário |
 | GET/POST | `/api/v1/sectors/` | Listar/criar setores |
+| GET | `/api/v1/sectors/features/` | Listar funcionalidades disponíveis para setores |
 | POST | `/api/v1/sectors/{id}/members/add/` | Adicionar membro |
 | POST | `/api/v1/sectors/{id}/members/remove/` | Remover membro |
 | GET/POST | `/api/v1/tickets/` | Listar/criar chamados |
 | GET/PATCH | `/api/v1/tickets/{id}/` | Detalhe/atualizar |
 | GET/POST | `/api/v1/tickets/statuses/` | Status de chamados |
+
+---
+
+## Catálogo de funcionalidades por setor
+
+Além de Chamados e Patrimônio, o projeto passa a disponibilizar módulos iniciais para o setor de Recursos Humanos.
+
+### Funcionalidades de RH no MVP
+
+| Slug | Nome exibido |
+|------|--------------|
+| `hr-employees` | Colaboradores |
+| `hr-recruitment` | Recrutamento e Seleção |
+| `hr-leave` | Férias e Ausências |
+| `hr-performance` | Avaliação de Desempenho |
+| `hr-training` | Treinamento e Desenvolvimento |
+
+### Como cadastrar o setor Recursos Humanos
+
+1. Aplique as migrations do backend.
+2. Acesse a tela administrativa de setores.
+3. Crie o setor Recursos Humanos manualmente.
+4. Selecione os módulos de RH necessários para o setor.
+5. Vincule os membros do RH ao setor.
+
+Observações:
+
+- A funcionalidade `tickets` continua obrigatória para todos os setores.
+- Os módulos de RH entram apenas como funcionalidades do setor neste MVP, sem nova rota ou menu dedicado.
 
 ---
 

@@ -18,7 +18,7 @@ import { ShellComponent } from '../../../shared/shell/shell.component';
           <button (click)="openForm()" class="btn btn-primary">+ Novo setor</button>
         </div>
 
-        <!-- FormulÃ¡rio de criaÃ§Ã£o RF10 -->
+        <!-- Formulário de criação RF10 -->
         <div class="form-card" *ngIf="showForm()">
           <h3>Novo Setor</h3>
           <div class="form-group">
@@ -26,7 +26,7 @@ import { ShellComponent } from '../../../shared/shell/shell.component';
             <input type="text" [(ngModel)]="newSector.name" class="form-control" />
           </div>
           <div class="form-group">
-            <label>DescriÃ§Ã£o</label>
+            <label>Descrição</label>
             <textarea [(ngModel)]="newSector.description" rows="3" class="form-control"></textarea>
           </div>
 
@@ -60,7 +60,7 @@ import { ShellComponent } from '../../../shared/shell/shell.component';
         <div class="sectors-grid" *ngIf="!loading()">
           <div class="sector-card" *ngFor="let s of sectors()">
             <div class="sector-name">{{ s.name }}</div>
-            <div class="sector-desc">{{ s.description || 'Sem descriÃ§Ã£o' }}</div>
+            <div class="sector-desc">{{ s.description || 'Sem descrição' }}</div>
             <div class="sector-meta">{{ s.member_count }} membro(s)</div>
             <div class="sector-features" *ngIf="s.features.length">
               <span *ngFor="let f of s.features" class="feature-badge">{{ f.name }}</span>
