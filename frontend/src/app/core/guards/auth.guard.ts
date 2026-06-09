@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { CanActivate, Router, UrlTree } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router, UrlTree } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { FeatureService } from '../services/feature.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
@@ -28,6 +29,30 @@ export class AdminGuard implements CanActivate {
     if (this.auth.isAuthenticated() && this.auth.isAdmin()) {
       return true;
     }
+    return this.router.createUrlTree(['/dashboard']);
+  }
+}
+
+@Injectable({ providedIn: 'root' })
+export class FeatureGuard implements CanActivate {
+  private auth = inject(AuthService);
+  private router = inject(Router);
+  private featureService = inject(FeatureService);
+
+  canActivate(route: ActivatedRouteSnapshot): boolean | UrlTree {
+    if (this.auth.isAdmin()) {
+      return true;
+    }
+
+    const requiredFeatureSlugs = route.data['requiredFeatureSlugs'];
+    const featureSlugs = Array.isArray(requiredFeatureSlugs)
+      ? requiredFeatureSlugs.filter((slug): slug is string => typeof slug === 'string')
+      : [];
+
+    if (featureSlugs.length === 0 || this.featureService.hasAnyFeature(featureSlugs)) {
+      return true;
+    }
+
     return this.router.createUrlTree(['/dashboard']);
   }
 }

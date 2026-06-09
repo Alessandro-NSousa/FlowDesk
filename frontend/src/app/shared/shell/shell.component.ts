@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-import { FeatureService } from '../../core/services/feature.service';
+import { FeatureService, HR_FEATURES, HR_FEATURE_SLUGS, SectorModuleFeature } from '../../core/services/feature.service';
 
 @Component({
   selector: 'fd-shell',
@@ -24,6 +24,19 @@ import { FeatureService } from '../../core/services/feature.service';
           <a *ngIf="hasPatrimony()" routerLink="/patrimony" routerLinkActive="active" class="nav-item">
             <span>Patrimônio</span>
           </a>
+          <div *ngIf="hasHrModules()" class="nav-group">
+            <a routerLink="/hr" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item nav-group-toggle">
+              <span>Recursos Humanos</span>
+            </a>
+            <a
+              *ngFor="let feature of visibleHrFeatures()"
+              [routerLink]="['/hr']"
+              [fragment]="feature.slug"
+              class="nav-subitem"
+            >
+              <span>{{ feature.label }}</span>
+            </a>
+          </div>
           <a *ngIf="isAdmin()" routerLink="/sectors" routerLinkActive="active" class="nav-item">
             <span>Setores</span>
           </a>
@@ -48,9 +61,13 @@ import { FeatureService } from '../../core/services/feature.service';
     .logo { padding:0 1.25rem 1.5rem; }
     .logo-text { font-size:1.4rem;font-weight:700;color:#fff; }
     .nav { flex:1; }
+    .nav-group { display:block; }
     .nav-item { display:block;padding:.65rem 1.25rem;color:#c7d2fe;text-decoration:none;font-size:.9rem;border-left:3px solid transparent;transition:all .2s; }
     .nav-item:hover { background:#312e81;color:#fff; }
     .nav-item.active { background:#312e81;color:#fff;border-left-color:#818cf8; }
+    .nav-group-toggle { padding-bottom:.45rem; }
+    .nav-subitem { display:block;padding:.45rem 1.25rem .45rem 2.4rem;color:#a5b4fc;text-decoration:none;font-size:.82rem;border-left:3px solid transparent;transition:all .2s; }
+    .nav-subitem:hover { background:#2a2770;color:#fff;border-left-color:#6366f1; }
     .sidebar-footer { padding:1.25rem;border-top:1px solid #312e81; }
     .user-name { display:block;font-size:.8rem;color:#a5b4fc;margin-bottom:.5rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
     .btn-logout { background:transparent;border:1px solid #4f46e5;color:#a5b4fc;padding:.35rem .75rem;border-radius:6px;cursor:pointer;font-size:.8rem;width:100%; }
@@ -69,6 +86,18 @@ export class ShellComponent {
 
   hasPatrimony(): boolean {
     return this.isAdmin() || this.featureService.hasFeature('patrimony');
+  }
+
+  hasHrModules(): boolean {
+    return this.isAdmin() || this.featureService.hasAnyFeature(HR_FEATURE_SLUGS);
+  }
+
+  visibleHrFeatures(): SectorModuleFeature[] {
+    if (this.isAdmin()) {
+      return [...HR_FEATURES];
+    }
+
+    return this.featureService.listEnabledHrFeatures();
   }
 
   userName(): string {

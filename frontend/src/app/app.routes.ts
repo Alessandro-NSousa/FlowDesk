@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
-import { AuthGuard, AdminGuard } from './core/guards/auth.guard';
+import { AuthGuard, AdminGuard, FeatureGuard } from './core/guards/auth.guard';
+import { HR_FEATURE_SLUGS } from './core/services/feature.service';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -22,6 +23,12 @@ export const routes: Routes = [
     path: 'patrimony',
     canActivate: [AuthGuard],
     loadChildren: () => import('./features/patrimony/patrimony.routes').then((m) => m.PATRIMONY_ROUTES),
+  },
+  {
+    path: 'hr',
+    canActivate: [AuthGuard, FeatureGuard],
+    data: { requiredFeatureSlugs: HR_FEATURE_SLUGS },
+    loadChildren: () => import('./features/hr/hr.routes').then((m) => m.HR_ROUTES),
   },
   {
     path: 'sectors',
